@@ -1,9 +1,20 @@
+const logger = require("./loggerMiddleware");
 const express = require("express");
 const joi = require("@hapi/joi");
 
 // Creates server which can listen to a port specified
 const app = express(); //returns an express object which has many functions
-app.use(express.json()); // http body-parser
+app.use(express.json()); // Middleware func - parses request body having JSON and return req.body object
+
+//Custom middleware function - takes 3 args-> req,res and next
+//its a good practice to make custom middleware as separate module and then require it like for below
+app.use(logger);
+
+//Another custom middleware
+app.use(function(req, res, next) {
+  console.log("Authentication middleware");
+  next(); //passes control to next middleware. Here its Route middleware which sends response
+});
 
 const courses = [
   { id: 1, name: "React" },
@@ -11,6 +22,7 @@ const courses = [
   { id: 3, name: "JavaScript" }
 ];
 
+//Final middleware (Route middleware) that sends response and end req-res-cycle
 app.get("/", (req, res) => {
   res.send("Hello World !!!");
 });
