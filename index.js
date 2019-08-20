@@ -1,10 +1,14 @@
 const logger = require("./loggerMiddleware");
 const express = require("express");
 const joi = require("@hapi/joi");
+const morgan = require("morgan");
 
 // Creates server which can listen to a port specified
 const app = express(); //returns an express object which has many functions
-app.use(express.json()); // Middleware func - parses request body having JSON and return req.body object
+app.use(express.json()); // Middleware func - parses JSON format request body and return req.body object
+app.use(express.urlencoded({ extended: true })); //Middleware func - parses urlencoded format request body to req.body object
+app.use(express.static("public")); // Middleware func - Can serve static files to client at => http://localhost:5000/readme.txt
+app.use(morgan("tiny")); // 3rd party middleware func - it logs every request received
 
 //Custom middleware function - takes 3 args-> req,res and next
 //its a good practice to make custom middleware as separate module and then require it like for below
@@ -24,7 +28,7 @@ const courses = [
 
 //Final middleware (Route middleware) that sends response and end req-res-cycle
 app.get("/", (req, res) => {
-  res.send("Hello World !!!");
+  res.send("Hello World !!!"); //sends response
 });
 
 app.get("/api/courses", (req, res) => {
