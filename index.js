@@ -2,13 +2,32 @@ const logger = require("./loggerMiddleware");
 const express = require("express");
 const joi = require("@hapi/joi");
 const morgan = require("morgan");
+const config = require("config");
 
 // Creates server which can listen to a port specified
 const app = express(); //returns an express object which has many functions
-app.use(express.json()); // Middleware func - parses JSON format request body and return req.body object
-app.use(express.urlencoded({ extended: true })); //Middleware func - parses urlencoded format request body to req.body object
-app.use(express.static("public")); // Middleware func - Can serve static files to client at => http://localhost:5000/readme.txt
-app.use(morgan("tiny")); // 3rd party middleware func - it logs every request received
+
+// 2 ways to find ENVIRONMENT of the application:
+console.log(`NODE_ENV : ${process.env.NODE_ENV}`);
+console.log(`app: ${app.get("env")}`);
+
+// CONFIGURATION for environment using config package:
+console.log(`App name: ${config.get("name")}`);
+console.log(`Mail Server: ${config.get("mail.server")}`);
+console.log(`Mail Server Password: ${config.get("mail.password")}`); //password saved in custom env variable is mapped to mail config in "custom-environment-variables.json file"
+
+// ------------------------------------------Middlewares-----------------------------------------
+//Below 3 are Built-in Express middlewares: json(), urlencoded(), static()
+app.use(express.json()); //  parses JSON format request body and return req.body object
+app.use(express.urlencoded({ extended: true })); // parses urlencoded format request body to req.body object
+app.use(express.static("public")); //  Can serve static files to client at => http://localhost:5000/readme.txt
+
+// morgan is 3rd party middleware func - it logs every request received
+// To ensure its enabled only in dev environment
+if (app.get("env") === "development") {
+  app.use(morgan("tiny"));
+  console.log("Morgan enabled...");
+}
 
 //Custom middleware function - takes 3 args-> req,res and next
 //its a good practice to make custom middleware as separate module and then require it like for below
@@ -19,6 +38,7 @@ app.use(function(req, res, next) {
   console.log("Authentication middleware");
   next(); //passes control to next middleware. Here its Route middleware which sends response
 });
+//----------------------------------------------------------------------------------------------------
 
 const courses = [
   { id: 1, name: "React" },
