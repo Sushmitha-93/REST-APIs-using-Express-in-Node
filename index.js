@@ -3,13 +3,18 @@ const express = require("express");
 const joi = require("@hapi/joi");
 const morgan = require("morgan");
 const config = require("config");
+const startUpDebugger = require("debug")("app:startUp"); // set DEBUG=app:startUp, app:db or (db:*)
+const dbDugger = require("debug")("app:db");
 
 // Creates server which can listen to a port specified
 const app = express(); //returns an express object which has many functions
 
 // 2 ways to find ENVIRONMENT of the application:
-console.log(`NODE_ENV : ${process.env.NODE_ENV}`);
-console.log(`app: ${app.get("env")}`);
+startUpDebugger(`NODE_ENV : ${process.env.NODE_ENV}`);
+startUpDebugger(`app: ${app.get("env")}`);
+
+// For example if there was DB work..
+dbDugger("DB connected..");
 
 // CONFIGURATION for environment using config package:
 console.log(`App name: ${config.get("name")}`);
